@@ -1,0 +1,29 @@
+name: flutter_a11y_check
+description: >-
+  One-line accessibility audit for Flutter widget tests. Checks tap targets, labels, text
+  contrast, images, 200% font size, duplicate labels and focus order, and prints a readable
+  report (text, Markdown or JSON) instead of a terse matcher failure.
+version: 0.1.0
+repository: https://github.com/youssef336/flutter_a11y_check
+issue_tracker: https://github.com/youssef336/flutter_a11y_check/issues
+topics:
+  - accessibility
+  - a11y
+  - testing
+  - widget-test
+  - wcag
+
+environment:
+  sdk: ^3.9.0
+  flutter: ">=3.35.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_localizations:
+    sdk: flutter
