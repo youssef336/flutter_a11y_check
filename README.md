@@ -1,3 +1,5 @@
+[العربية](README.ar.md)
+
 <h1 align="center">flutter_a11y_check</h1>
 
 <p align="center">
@@ -5,6 +7,7 @@
 </p>
 
 <p align="center">
+  <a href="https://pub.dev/packages/flutter_a11y_check"><img src="https://img.shields.io/pub/v/flutter_a11y_check?style=for-the-badge&logo=dart&label=pub.dev" alt="pub.dev"/></a>
   <img src="https://img.shields.io/badge/Flutter-%E2%89%A53.35-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter">
   <img src="https://img.shields.io/badge/Dart-%5E3.9-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart">
   <img src="https://img.shields.io/badge/WCAG-2.x%20AA%20%2F%20AAA-6A1B9A?style=for-the-badge" alt="WCAG">
@@ -26,13 +29,11 @@
 > test. It builds on the logic of `flutter_test`'s `androidTapTargetGuideline`,
 > `labeledTapTargetGuideline` and `textContrastGuideline`, and adds the rest.
 
-<div dir="rtl">
+One line inside a widget test audits the whole screen for accessibility. Instead of the terse
+`meetsGuideline` message that stops at the first mistake, you get a report with every problem: the
+widget, its place in the tree, its size, the measured values, and how to fix it.
 
-سطر واحد جوه الـ widget test بيفحص الشاشة كلها من ناحية الـ accessibility، وبدل
-رسالة `meetsGuideline` المختصرة اللي بتقف عند أول غلطة، بيطلعلك تقرير فيه كل
-المشاكل: الويدجت، ومكانه في الشجرة، ومقاسه، والأرقام اللي اتقاست، وتصلّحها إزاي.
-
-## ✨ بيعمل إيه
+## ✨ What it does
 
 ```dart
 testWidgets('login is accessible', (tester) async {
@@ -41,56 +42,49 @@ testWidgets('login is accessible', (tester) async {
 });
 ```
 
-أو لو عايز التقرير من غير ما التست يفشل:
+Or, if you want the report without failing the test:
 
 ```dart
 final report = await auditAccessibility(tester);
 debugPrint(report.toMarkdown());                    // أو toText() أو toJsonString()
 ```
 
-| القاعدة | الخطورة | بتمسك إيه |
+| Rule | Severity | What it catches |
 |---|---|---|
-| `tap-target` | 🔴 error | أي حاجة بتتداس أصغر من 48x48 (أو 44x44 لو `minTapTarget: 44`) |
-| `missing-label` | 🔴 error | `IconButton` من غير `tooltip`، أو `GestureDetector`/`InkWell` حوالين أيقونة أو صورة من غير `Semantics` |
-| `contrast` | 🔴 error | نص التباين بتاعه أقل من WCAG AA (4.5:1 للنص العادي، 3:1 للكبير)، متقاس من الصورة اللي اترسمت فعلًا |
-| `image-label` | 🟡 warning | `Image` من غير `semanticLabel` ومش متعلّمة إنها ديكور (`excludeFromSemantics`) |
-| `text-scale` | 🔴 / 🟡 | الشاشة بتتكسر على 200%: overflow، أو نص بيتقص (ellipsis)، أو نص مش بيكبر خالص |
-| `duplicate-label` | 🟡 warning | كذا زرار على نفس الشاشة اسمهم واحد (تلات زراير «Remove») |
-| `generic-label` | 🟡 warning | label مبيقولش حاجة: «Button»، «Icon»، «Click here» |
-| `focus-order` | 🔵 info | (اختياري) ترتيب الـ screen reader / switch access بيرجع لورا عكس ترتيب القراية، ويعرف الـ RTL |
+| `tap-target` | 🔴 error | Anything tappable smaller than 48x48 (or 44x44 with `minTapTarget: 44`) |
+| `missing-label` | 🔴 error | An `IconButton` with no `tooltip`, or a `GestureDetector`/`InkWell` around an icon or image with no `Semantics` |
+| `contrast` | 🔴 error | Text whose contrast is below WCAG AA (4.5:1 for normal text, 3:1 for large), measured from the image that was actually rendered |
+| `image-label` | 🟡 warning | An `Image` with no `semanticLabel` that is not marked as decorative (`excludeFromSemantics`) |
+| `text-scale` | 🔴 / 🟡 | The screen breaks at 200%: overflow, text that gets cut (ellipsis), or text that does not grow at all |
+| `duplicate-label` | 🟡 warning | Several buttons on the same screen with the same name (three "Remove" buttons) |
+| `generic-label` | 🟡 warning | A label that says nothing: "Button", "Icon", "Click here" |
+| `focus-order` | 🔵 info | (Optional) the screen reader / switch access order jumps backwards against the reading order; RTL-aware |
 
-- 🧭 **كل finding** فيه: severity، و rule id، ورسالة بالإنجليزي، واقتراح تصليح، ونوع الويدجت،
-  والـ path بتاعه (`BadScreen > Scaffold > AppBar > IconButton`)، والـ rect، والأرقام (المقاس،
-  نسبة التباين، الألوان، اللون المقترح).
-- 🔁 **بيلف على أكتر من حالة**: كل `textScales` (الافتراضي 100% و 200%)، وكل locale إضافي، و `rtl: true`.
-  نفس المشكلة لو ظهرت في أكتر من حالة بتتكتب مرة واحدة، ومكتوب جنبها ظهرت فين.
-- 🙈 **تجاهل** بالقاعدة، أو بـ `Finder`، أو بـ `Key`، أو بالـ label.
-- 🎨 **التقرير**: نص ملوّن للـ console، و Markdown لكومنت الـ PR، و JSON للـ CI.
-- ♻️ بيرجّع الـ text scale والـ locale زي ما كانوا بعد الفحص.
+- 🧭 **Every finding** has: a severity, a rule id, a message in English, a fix suggestion, the widget
+  type, its path (`BadScreen > Scaffold > AppBar > IconButton`), the rect, and the values (size,
+  contrast ratio, colors, suggested color).
+- 🔁 **It runs over several states**: every entry in `textScales` (by default 100% and 200%), every
+  extra locale, and `rtl: true`. The same problem, if it shows up in more than one state, is written
+  once, with a note of where it appeared.
+- 🙈 **Ignore** by rule, by `Finder`, by `Key`, or by label.
+- 🎨 **The report**: colored text for the console, Markdown for a PR comment, and JSON for CI.
+- ♻️ It restores the text scale and the locale to what they were after the audit.
 
-## 📦 التسطيب
+## 📦 Installation
 
-من GitHub كـ git dependency في `dev_dependencies`:
-
-</div>
+From GitHub as a git dependency in `dev_dependencies`:
 
 ```yaml
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_a11y_check:
-    git:
-      url: https://github.com/youssef336/flutter_a11y_check.git
-      ref: v0.1.0
+  flutter_a11y_check: ^0.1.1
 ```
 
-<div dir="rtl">
+Then `flutter pub get`, and `import 'package:flutter_a11y_check/flutter_a11y_check.dart';` in the
+test.
 
-وبعدين `flutter pub get`، و `import 'package:flutter_a11y_check/flutter_a11y_check.dart';` في التست.
-
-## ⚙️ الإعدادات
-
-</div>
+## ⚙️ Configuration
 
 ```dart
 await expectAccessible(
@@ -115,13 +109,9 @@ await expectAccessible(
 );
 ```
 
-<div dir="rtl">
+## 🧾 What the report looks like
 
-## 🧾 شكل التقرير
-
-ده جزء من التقرير بتاع الشاشة الوحشة اللي في `example/` (بالـ `toText(color: false)`):
-
-</div>
+This is part of the report for the bad screen in `example/` (with `toText(color: false)`):
 
 ```text
 Accessibility audit FAILED: 6 errors, 5 warnings, 0 info
@@ -155,61 +145,60 @@ WARN   duplicate-label  3 tappable TextButton widgets on this screen are all lab
        fix   Make each label unique by adding context, e.g. 'Delete Invoice #12', or merge the repeated controls into one.
 ```
 
-<div dir="rtl">
+## 🧪 The example
 
-## 🧪 المثال
-
-`example/` فيه app بشاشتين: `BadScreen` فيها مثال لكل مشكلة، و `GoodScreen` نفس الشاشة بعد
-التصليح. التستات في `example/test/rules_test.dart` بتثبت إن كل قاعدة بتمسك الشاشة الوحشة،
-وإن الشاشة الكويسة بتعدّي كل القواعد على 100% و 200% وبالعربي RTL.
+`example/` contains an app with two screens: `BadScreen` has an example of every problem, and
+`GoodScreen` is the same screen after the fixes. The tests in `example/test/rules_test.dart` prove
+that every rule catches the bad screen, and that the good screen passes every rule at 100% and 200%
+and in Arabic RTL.
 
 ```bash
 cd example && flutter test
 ```
 
-## ❓ أسئلة
+## ❓ FAQ
 
-**ليه مش `meetsGuideline` وخلاص؟**
-`meetsGuideline` بيقولك «فيه مشكلة» ويديك `SemanticsNode#42` ومقاس. هنا بتاخد كل المشاكل
-مرة واحدة، والويدجت باسمه ومكانه في الشجرة، والتصليح. وفيه قواعد مش موجودة هناك: الصور، والـ
-200%، والأسماء المكررة، وترتيب الـ focus.
+**Why not just `meetsGuideline`?**
+`meetsGuideline` tells you "there is a problem" and gives you `SemanticsNode#42` and a size. Here you
+get all the problems at once, with the widget by name, its place in the tree, and the fix. And there
+are rules that do not exist there: images, 200%, duplicate names, and focus order.
 
-**التست بقى أبطأ؟**
-كل حالة (scale × locale) بتعمل pump وصورة للشاشة عشان التباين. لو عايز أسرع:
-`textScales: [1.0]` أو `contrast: ContrastLevel.off`.
+**Did the test get slower?**
+Every state (scale × locale) does a pump and an image of the screen for the contrast check. If you
+want it faster: `textScales: [1.0]` or `contrast: ContrastLevel.off`.
 
-**الـ RTL مش بيشتغل؟**
-الفحص بيغيّر الـ locale بتاع الـ test platform بس. لازم الـ app يكون فيه `Locale('ar')` في
-`supportedLocales` ومعاه `GlobalMaterialLocalizations.delegates`. لو الشاشة فضلت LTR، التقرير
-بيقولك في `notes` ومش بيعيد نفس الفحص على الفاضي.
+**RTL does not work?**
+The audit only changes the test platform's locale. The app must have `Locale('ar')` in
+`supportedLocales` together with `GlobalMaterialLocalizations.delegates`. If the screen stays LTR,
+the report tells you in `notes` and does not repeat the same audit for nothing.
 
-**عندي warning مقبول (زي «Delete» في كل صف في لستة)؟**
-`A11yIgnore.label('Delete', rules: {A11yRule.duplicateLabel})`، أو
-`failOn: A11ySeverity.error` عشان الـ warnings تظهر من غير ما تفشّل التست.
+**I have an acceptable warning (like "Delete" on every row in a list)?**
+`A11yIgnore.label('Delete', rules: {A11yRule.duplicateLabel})`, or `failOn: A11ySeverity.error` so
+warnings show up without failing the test.
 
-**هل بيشتغل مع Cupertino؟**
-أيوه، القواعد كلها على الـ semantics tree والـ render tree، مش على Material بس.
-للـ iOS استخدم `minTapTarget: A11yConfig.iosTapTarget`.
+**Does it work with Cupertino?**
+Yes, all the rules work on the semantics tree and the render tree, not on Material only. For iOS use
+`minTapTarget: A11yConfig.iosTapTarget`.
 
-## ⚖️ الحدود
+## ⚖️ Limitations
 
-- التباين بيتقاس من الصورة اللي اترسمت في التست. خط التست بيرسم مربعات، فالنتيجة دقيقة للون
-  النص على الخلفية، بس مش بتشوف anti-aliasing الخط الحقيقي. ولو النص فوق صورة أو gradient،
-  الخلفية بتتاخد من أكتر لون حوالين النص.
-- «نص كبير» حسب WCAG: 24px، أو 18.66px لو bold (بعد الـ scale). ده أشد شوية من `flutter_test`
-  اللي بيعتبر 18px كبير.
-- الـ `text-scale` بيشوف الـ overflow اللي Flutter بيبلّغ عنه (`RenderFlex overflowed`) والنص
-  اللي اتقص بـ `maxLines`. نص بيتقص بـ `ClipRect` أو container ارتفاعه ثابت من غير error مش
-  بيبان. وكل `RenderFlex` بيبلّغ عن الـ overflow مرة واحدة بس، فبيتكتب عند أول scale كسرته.
-- الـ widget path تقريبي: بيعرض widgets معروفة (Scaffold، AppBar، Row …) وأي widget اسمه
-  بيخلص بـ `Screen`/`Page`/`View`/`Dialog`/`Sheet`. ضيف أسماءك في `pathLandmarks`.
-- `focus-order` بيقارن ترتيب الـ semantics (اللي بيستخدمه TalkBack / VoiceOver / switch access)
-  بترتيب القراية، ومش بيقرا `FocusTraversalPolicy` بتاع الكيبورد. وهو info واختياري لإن
-  التصميمات اللي فيها أعمدة جنب بعض ممكن تطلّع ملاحظات مقصودة.
-- مش بيفحص: الـ labels بلغة الـ app، ولا الـ live regions، ولا الـ custom actions، ولا تباين
-  الأيقونات والعناصر اللي مش نص (WCAG 1.4.11).
-
-</div>
+- Contrast is measured from the image rendered in the test. The test font draws boxes, so the result
+  is accurate for the text color against the background, but it does not see the real font's
+  anti-aliasing. And if the text is over an image or a gradient, the background is taken from the
+  most common color around the text.
+- "Large text" per WCAG: 24px, or 18.66px if bold (after scaling). That is a bit stricter than
+  `flutter_test`, which treats 18px as large.
+- `text-scale` sees the overflow that Flutter reports (`RenderFlex overflowed`) and text cut by
+  `maxLines`. Text cut by a `ClipRect` or a fixed-height container without an error does not show up.
+  And each `RenderFlex` reports its overflow only once, so it is recorded at the first scale that
+  broke it.
+- The widget path is approximate: it shows well-known widgets (Scaffold, AppBar, Row …) and any widget
+  whose name ends in `Screen`/`Page`/`View`/`Dialog`/`Sheet`. Add your own names in `pathLandmarks`.
+- `focus-order` compares the semantics order (the one TalkBack / VoiceOver / switch access use) with
+  the reading order, and does not read the keyboard's `FocusTraversalPolicy`. It is info and
+  optional because designs with side-by-side columns can produce intentional findings.
+- It does not check: labels in the app's language, live regions, custom actions, or the contrast of
+  icons and non-text elements (WCAG 1.4.11).
 
 ## 🛠 Tech stack
 

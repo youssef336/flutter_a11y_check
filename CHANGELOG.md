@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- English README (Arabic version moved to README.ar.md)
+- Shorter package description
+
 ## 0.1.0
 
 First release.

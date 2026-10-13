@@ -1,7 +1,7 @@
 name: flutter_a11y_check_example
 description: Example app with a deliberately inaccessible screen and a fixed one.
 publish_to: none
-version: 0.1.0
+version: 0.1.1
 
 environment:
   sdk: ^3.9.0
