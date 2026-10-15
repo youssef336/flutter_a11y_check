@@ -1,5 +1,7 @@
 [English](README.md)
 
+<p align="center"><img src="https://raw.githubusercontent.com/youssef336/flutter_a11y_check/main/screenshots/banner.png" alt="flutter_a11y_check banner" width="100%"></p>
+
 <h1 align="center">flutter_a11y_check</h1>
 
 <p align="center">
